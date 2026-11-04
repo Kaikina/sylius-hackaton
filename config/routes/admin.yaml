@@ -1,1 +1,10 @@
-# Define your own admin routes here
+evolutive_sylius_wishlist_admin_wishlist:
+    resource: |
+        alias: evolutive_sylius_wishlist.wishlist
+        section: admin
+        templates: "@SyliusAdmin\\shared\\crud"
+        only: ['index', 'delete', 'bulkDelete']
+        grid: evolutive_sylius_wishlist_admin_wishlist
+        permission: true
+    type: sylius.resource
+    prefix: '/%sylius_admin.path_name%'

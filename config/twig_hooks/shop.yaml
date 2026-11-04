@@ -12,6 +12,11 @@ sylius_twig_hooks:
                     product: '@=_context.product'
                 priority: 200
 
+        'sylius_shop.product.show.content':
+            wishlist_modal:
+                template: '@EvolutiveSyliusWishlistPlugin/shop/product/show/wishlist_modal.html.twig'
+                priority: -100
+
         'sylius_shop.product.show.content.info.summary':
             wishlist:
                 component: 'evolutive_wishlist:product_toggle'

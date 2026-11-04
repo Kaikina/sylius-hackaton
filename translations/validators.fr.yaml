@@ -1,0 +1,5 @@
+evolutive_sylius_wishlist:
+    wishlist:
+        name:
+            not_blank: Veuillez saisir un nom pour la liste.
+            max_length: Le nom de la liste ne doit pas dépasser {{ limit }} caractères.

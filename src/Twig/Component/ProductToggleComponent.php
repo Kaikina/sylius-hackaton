@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Evolutive\SyliusWishlistPlugin\Twig\Component;
 
 use Evolutive\SyliusWishlistPlugin\Checker\VariantAvailabilityChecker;
-use Evolutive\SyliusWishlistPlugin\Modifier\WishlistModifier;
+use Evolutive\SyliusWishlistPlugin\Context\WishlistContextInterface;
 use Sylius\Bundle\ShopBundle\Twig\Component\Product\AddToCartFormComponent;
-use Sylius\Component\Channel\Context\ChannelContextInterface;
-use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
@@ -16,19 +14,16 @@ use Sylius\Component\Core\Repository\ProductVariantRepositoryInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 use Sylius\TwigHooks\LiveComponent\HookableLiveComponentTrait;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\PostMount;
 
-/** Heart on the product page: follows the variant selected in the add-to-cart form. */
+/** "Add to wishlist" on the product page: opens the wishlist picker for the variant selected in the add-to-cart form. */
 #[AsLiveComponent(name: 'evolutive_wishlist:product_toggle', template: '@EvolutiveSyliusWishlistPlugin/shop/components/product_toggle.html.twig')]
 final class ProductToggleComponent
 {
-    use ComponentToolsTrait;
     use DefaultActionTrait;
     use HookableLiveComponentTrait;
     use ProductVariantsHydrationTrait;
@@ -44,9 +39,8 @@ final class ProductToggleComponent
      * @param ProductVariantRepositoryInterface<ProductVariantInterface> $productVariantRepository
      */
     public function __construct(
-        private readonly WishlistModifier $wishlistModifier,
+        private readonly WishlistContextInterface $wishlistContext,
         private readonly VariantAvailabilityChecker $availabilityChecker,
-        private readonly ChannelContextInterface $channelContext,
         private readonly ProductVariantResolverInterface $productVariantResolver,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly ProductVariantRepositoryInterface $productVariantRepository,
@@ -71,27 +65,19 @@ final class ProductToggleComponent
             : $this->findProductVariant($this->product, (int) $variantId);
     }
 
-    #[LiveAction]
-    public function toggle(): void
+    #[LiveListener('evolutive_wishlist:changed')]
+    public function refresh(): void
     {
-        if (!$this->isWishlistable() || null === $this->variant) {
-            return;
-        }
-
-        $this->wishlistModifier->toggle($this->variant);
-        $this->emit('evolutive_wishlist:changed');
     }
 
     public function isWishlistable(): bool
     {
-        /** @var ChannelInterface $channel */
-        $channel = $this->channelContext->getChannel();
-
-        return null !== $this->variant && $this->availabilityChecker->isWishlistable($this->variant, $channel);
+        return null !== $this->variant &&
+            $this->availabilityChecker->isWishlistable($this->variant, $this->wishlistContext->getChannel());
     }
 
     public function isInWishlist(): bool
     {
-        return null !== $this->variant && $this->wishlistModifier->isInWishlist($this->variant);
+        return null !== $this->variant && [] !== $this->wishlistContext->getWishlistsContaining($this->variant);
     }
 }

@@ -7,16 +7,20 @@ Lets shoppers, guests or logged-in customers, save purchasable products to come 
 ### Wishlist
 
 **Wishlist**:
-A saved list of product variants that belongs to one Wishlist Owner within one Channel.
+A named, saved list of product variants that belongs to one Wishlist Owner within one Channel. An owner can have several (e.g. "Birthday", "Christmas"); names are required and never blank.
 _Avoid_: Favorites, saved items, list
 
 **Wishlist Item**:
-One product variant inside a Wishlist. A variant appears at most once per Wishlist.
+One product variant inside a Wishlist. A variant appears at most once per Wishlist, but may be in several Wishlists.
 _Avoid_: Entry, line, wishlisted product
 
-**Current Wishlist**:
-The Wishlist that add/remove actions target for the current visitor in the current Channel. In V1, every owner has exactly one Wishlist per Channel.
-_Avoid_: Default wishlist, active wishlist
+**Destination**:
+A Wishlist the shopper picks when adding a product from a product page or listing. There is no implicit default Wishlist.
+_Avoid_: Current wishlist, default wishlist
+
+**Move**:
+Copying the selected variants into one or more Destinations, skipping those already there, then removing them from the source Wishlist.
+_Avoid_: Transfer
 
 ### Ownership
 
@@ -37,8 +41,8 @@ An opaque identifier, kept in the guest's session (like the guest cart), that id
 A Guest Wishlist whose session is gone, so nobody can reach it any more.
 
 **Wishlist Adoption**:
-At login, a Guest Wishlist becomes the Customer's Wishlist, but only if the Customer has none in that Channel. Otherwise the Guest Wishlist is discarded.
-_Avoid_: Merge, conversion
+At login, each Guest Wishlist becomes one of the Customer's Wishlists. If the Customer already has one with the same name (case-insensitive) in that Channel, the guest's variants are added to it instead and the Guest Wishlist is deleted.
+_Avoid_: Conversion
 
 ### Lifecycle
 

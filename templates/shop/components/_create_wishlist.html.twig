@@ -1,0 +1,36 @@
+{# Inline creation for the pickers; the field has no name so an enclosing page form never submits it. #}
+{% if this.creating %}
+    <div class="input-group has-validation">
+        <input type="text"
+               class="form-control{{ this.creationError ? ' is-invalid' }}"
+               maxlength="255"
+               autocomplete="off"
+               placeholder="{{ 'evolutive_sylius_wishlist.form.wishlist.name'|trans }}"
+               aria-label="{{ 'evolutive_sylius_wishlist.form.wishlist.name'|trans }}"
+               value="{{ this.newName }}"
+               data-model="norender|newName"
+               data-action="keydown.enter->live#action:prevent"
+               data-live-action-param="create"
+               autofocus
+               {{ sylius_test_html_attribute('wishlist-new-name') }}>
+        <button type="button" class="btn btn-primary"
+                data-action="live#action" data-live-action-param="create"
+                data-loading="addAttribute(disabled)"
+                {{ sylius_test_html_attribute('wishlist-new-submit') }}>
+            {{ 'evolutive_sylius_wishlist.ui.create'|trans }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary"
+                data-action="live#action" data-live-action-param="cancelCreating">
+            {{ 'sylius.ui.cancel'|trans }}
+        </button>
+        {% if this.creationError %}
+            <div class="invalid-feedback" {{ sylius_test_html_attribute('wishlist-new-error') }}>{{ this.creationError|trans }}</div>
+        {% endif %}
+    </div>
+{% else %}
+    <button type="button" class="btn btn-link px-0"
+            data-action="live#action" data-live-action-param="startCreating"
+            {{ sylius_test_html_attribute('wishlist-new') }}>
+        + {{ 'evolutive_sylius_wishlist.ui.create_new_wishlist'|trans }}
+    </button>
+{% endif %}

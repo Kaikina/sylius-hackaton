@@ -1,0 +1,44 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+
+{% block title %}{{ 'evolutive_sylius_wishlist.ui.my_wishlists'|trans }} | {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5" {{ sylius_test_html_attribute('wishlists') }}>
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+        <h1 class="h2 mb-0 me-auto">{{ 'evolutive_sylius_wishlist.ui.my_wishlists'|trans }}</h1>
+        <a href="{{ path('evolutive_sylius_wishlist_shop_wishlist_create') }}" class="btn btn-primary" {{ sylius_test_html_attribute('wishlist-new-page') }}>
+            + {{ 'evolutive_sylius_wishlist.ui.new_wishlist'|trans }}
+        </a>
+    </div>
+
+    {% if wishlists is empty %}
+        <div class="text-center py-5" {{ sylius_test_html_attribute('wishlists-empty') }}>
+            <p class="lead mb-4">{{ 'evolutive_sylius_wishlist.ui.no_wishlist_yet'|trans }}</p>
+            <a href="{{ path('sylius_shop_homepage') }}" class="btn btn-outline-primary">{{ 'evolutive_sylius_wishlist.ui.continue_shopping'|trans }}</a>
+        </div>
+    {% else %}
+        <div class="row g-3">
+            {% for wishlist in wishlists %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100" {{ sylius_test_html_attribute('wishlist-card', wishlist.name) }}>
+                        <div class="card-body">
+                            <h2 class="h5 card-title mb-1">
+                                <a href="{{ path('evolutive_sylius_wishlist_shop_wishlist_show', {id: wishlist.id}) }}" class="link-reset stretched-link" {{ sylius_test_html_attribute('wishlist-card-link') }}>{{ wishlist.name }}</a>
+                            </h2>
+                            <p class="card-text text-body-secondary small mb-0" {{ sylius_test_html_attribute('wishlist-card-count', wishlist.countItems) }}>
+                                {{ 'evolutive_sylius_wishlist.ui.products_count'|trans({'%count%': wishlist.countItems}) }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent d-flex gap-2 position-relative" style="z-index: 2;">
+                            <a href="{{ path('evolutive_sylius_wishlist_shop_wishlist_update', {id: wishlist.id}) }}" class="btn btn-sm btn-outline-secondary" {{ sylius_test_html_attribute('wishlist-rename', wishlist.name) }}>
+                                {{ 'evolutive_sylius_wishlist.ui.rename'|trans }}
+                            </a>
+                            {{ include('@EvolutiveSyliusWishlistPlugin/shop/wishlist/_delete_form.html.twig', {wishlist, button_class: 'btn btn-sm btn-outline-danger'}) }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

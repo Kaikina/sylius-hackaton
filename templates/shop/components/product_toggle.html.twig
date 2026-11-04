@@ -1,11 +1,11 @@
 <div class="mb-3" {{ attributes }}>
     {% set active = this.inWishlist %}
+    {# The modal lives in a separate hook entry (product/show/wishlist_modal.html.twig). #}
+    {% set modal_id = 'evolutive-wishlist-product-modal' %}
     <button type="button"
             class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"
-            aria-pressed="{{ active ? 'true' : 'false' }}"
-            data-action="live#action"
-            data-live-action-param="toggle"
-            data-loading="addAttribute(disabled)"
+            data-bs-toggle="modal"
+            data-bs-target="#{{ modal_id }}"
             {{ not this.wishlistable ? 'disabled' }}
             {{ sylius_test_html_attribute('wishlist-toggle') }}>
         {{ include('@EvolutiveSyliusWishlistPlugin/shop/components/_heart.html.twig', {active}) }}

@@ -1,0 +1,119 @@
+# Every lookup is scoped to the current owner (customer, or guest token) and channel:
+# another visitor's wishlist id resolves to a 404.
+
+evolutive_sylius_wishlist_shop_wishlist_index:
+    path: /wishlists
+    methods: [GET]
+    defaults:
+        _controller: evolutive_sylius_wishlist.controller.wishlist::indexAction
+        _sylius:
+            section: shop
+            template: "@EvolutiveSyliusWishlistPlugin/shop/wishlist/index.html.twig"
+            paginate: false
+            repository:
+                method: findByOwner
+                arguments:
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getChannel()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getCustomer()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getGuestToken()"
+
+evolutive_sylius_wishlist_shop_wishlist_create:
+    path: /wishlists/new
+    methods: [GET, POST]
+    defaults:
+        _controller: evolutive_sylius_wishlist.controller.wishlist::createAction
+        _sylius:
+            section: shop
+            template: "@EvolutiveSyliusWishlistPlugin/shop/wishlist/create.html.twig"
+            form: Evolutive\SyliusWishlistPlugin\Form\Type\WishlistType
+            redirect:
+                route: evolutive_sylius_wishlist_shop_wishlist_show
+                parameters: { id: resource.id }
+
+evolutive_sylius_wishlist_shop_wishlist_show:
+    path: /wishlists/{id}
+    methods: [GET]
+    requirements: { id: '\d+' }
+    defaults:
+        _controller: evolutive_sylius_wishlist.controller.wishlist::showAction
+        _sylius:
+            section: shop
+            template: "@EvolutiveSyliusWishlistPlugin/shop/wishlist/show.html.twig"
+            repository:
+                method: findOneByIdAndOwner
+                arguments:
+                    - $id
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getChannel()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getCustomer()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getGuestToken()"
+
+evolutive_sylius_wishlist_shop_wishlist_update:
+    path: /wishlists/{id}/edit
+    methods: [GET, PUT]
+    requirements: { id: '\d+' }
+    defaults:
+        _controller: evolutive_sylius_wishlist.controller.wishlist::updateAction
+        _sylius:
+            section: shop
+            template: "@EvolutiveSyliusWishlistPlugin/shop/wishlist/update.html.twig"
+            form: Evolutive\SyliusWishlistPlugin\Form\Type\WishlistType
+            repository:
+                method: findOneByIdAndOwner
+                arguments:
+                    - $id
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getChannel()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getCustomer()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getGuestToken()"
+            redirect:
+                route: evolutive_sylius_wishlist_shop_wishlist_show
+                parameters: { id: resource.id }
+
+evolutive_sylius_wishlist_shop_wishlist_delete:
+    path: /wishlists/{id}
+    methods: [DELETE]
+    requirements: { id: '\d+' }
+    defaults:
+        _controller: evolutive_sylius_wishlist.controller.wishlist::deleteAction
+        _sylius:
+            section: shop
+            repository:
+                method: findOneByIdAndOwner
+                arguments:
+                    - $id
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getChannel()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getCustomer()"
+                    - "expr:service('evolutive_sylius_wishlist.context.wishlist').getGuestToken()"
+            redirect: evolutive_sylius_wishlist_shop_wishlist_index
+
+evolutive_sylius_wishlist_shop_wishlist_items_add_to_cart:
+    path: /wishlists/{id}/items/add-to-cart
+    methods: [POST]
+    requirements: { id: '\d+' }
+    controller: Evolutive\SyliusWishlistPlugin\Controller\Shop\AddWishlistItemsToCartAction
+
+evolutive_sylius_wishlist_shop_wishlist_items_remove:
+    path: /wishlists/{id}/items/remove
+    methods: [POST]
+    requirements: { id: '\d+' }
+    controller: Evolutive\SyliusWishlistPlugin\Controller\Shop\RemoveWishlistItemsAction
+
+evolutive_sylius_wishlist_shop_wishlist_items_move:
+    path: /wishlists/{id}/items/move
+    methods: [POST]
+    requirements: { id: '\d+' }
+    controller: Evolutive\SyliusWishlistPlugin\Controller\Shop\MoveWishlistItemsAction
+
+evolutive_sylius_wishlist_shop_wishlist_clear:
+    path: /wishlists/{id}/clear
+    methods: [POST]
+    requirements: { id: '\d+' }
+    controller: Evolutive\SyliusWishlistPlugin\Controller\Shop\ClearWishlistAction
+
+# Stage 1 URL
+evolutive_sylius_wishlist_shop_legacy_wishlist:
+    path: /wishlist
+    methods: [GET]
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: evolutive_sylius_wishlist_shop_wishlist_index
+        permanent: true

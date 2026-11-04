@@ -1,0 +1,11 @@
+{# Expects: form, action, method, submit_label #}
+{{ form_start(form, {action: action, attr: {novalidate: 'novalidate'}}) }}
+    {% if method != 'POST' %}
+        <input type="hidden" name="_method" value="{{ method }}">
+    {% endif %}
+    {{ form_row(form.name, {attr: {autofocus: 'autofocus'}}) }}
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" {{ sylius_test_html_attribute('wishlist-form-submit') }}>{{ submit_label|trans }}</button>
+        <a href="{{ cancel_path }}" class="btn btn-outline-secondary">{{ 'sylius.ui.cancel'|trans }}</a>
+    </div>
+{{ form_end(form) }}

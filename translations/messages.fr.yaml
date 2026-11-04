@@ -1,25 +1,52 @@
 evolutive_sylius_wishlist:
     ui:
-        my_wishlist: Ma liste d'envies
-        add_to_wishlist: Ajouter à ma liste d'envies
-        remove_from_wishlist: Retirer de ma liste d'envies
-        in_wishlist: Dans votre liste d'envies
-        choose_variant: 'Ajouter « %product% » à votre liste d''envies'
+        my_wishlists: Mes listes d'envies
+        wishlists: Listes d'envies
+        all_wishlists: Toutes les listes
+        new_wishlist: Nouvelle liste
+        create: Créer
+        create_new_wishlist: Créer une nouvelle liste
+        rename: Renommer
+        rename_wishlist: Renommer la liste
+        delete: Supprimer
+        delete_confirmation: 'Supprimer la liste « %wishlist% » ? Ses produits restent dans la boutique et dans vos autres listes.'
+        no_wishlist_yet: Vous n'avez pas encore de liste d'envies.
+        no_other_wishlist: Vous n'avez pas encore d'autre liste.
+        products_count: '{0}Aucun produit|{1}1 produit|]1,Inf[%count% produits'
+        products: Produits
+        owner: Propriétaire
+        guest: Invité
+        add_to_wishlist: Ajouter à une liste d'envies
+        in_wishlist: Dans vos listes d'envies
+        add_product_to_wishlist: 'Ajouter « %product% » à une liste d''envies'
+        choose_destination: Choisissez les listes de ce produit
+        choose_another_variant: Choisir une autre déclinaison
+        not_wishlistable: Ce produit ne peut pas être ajouté à une liste d'envies.
         close: Fermer
-        empty: Votre liste d'envies est vide.
+        empty: Cette liste d'envies est vide.
         continue_shopping: Continuer mes achats
         select: Sélectionner
         select_all: Tout sélectionner
         add_selected_to_cart: Ajouter la sélection au panier
+        move_to: Déplacer vers…
+        move_selected_to: Déplacer les produits sélectionnés vers
+        move: Déplacer
         remove_selected: Retirer la sélection
         clear: Vider la liste
-        clear_confirmation: Retirer tous les produits de votre liste d'envies ?
+        clear_confirmation: Retirer tous les produits de cette liste ?
         unavailable: Indisponible
         remove: Retirer
+    form:
+        wishlist:
+            name: Nom
     flash:
-        invalid_csrf: Votre session a expiré, veuillez réessayer.
+        invalid_form: Votre session a expiré, veuillez réessayer.
         nothing_selected: Veuillez sélectionner au moins un produit.
-        cleared: Votre liste d'envies a été vidée.
-        removed: '{0}Aucun produit retiré.|{1}1 produit retiré de votre liste d''envies.|]1,Inf[%count% produits retirés de votre liste d''envies.'
+        no_destination_selected: Veuillez choisir au moins une liste vers laquelle déplacer les produits.
+        not_wishlistable: Ce produit ne peut pas être ajouté à une liste d'envies.
+        not_created: La liste n'a pas pu être créée.
+        cleared: 'La liste « %wishlist% » a été vidée.'
+        removed: '{0}Aucun produit retiré.|{1}1 produit retiré de la liste.|]1,Inf[%count% produits retirés de la liste.'
+        moved: '{1}1 produit déplacé vers %wishlists%.|]1,Inf[%count% produits déplacés vers %wishlists%.'
         added_to_cart: '{1}1 produit ajouté au panier.|]1,Inf[%count% produits ajoutés au panier.'
         not_added_to_cart: '{1}Ce produit n''est plus disponible et n''a pas été ajouté au panier : %products%|]1,Inf[Ces produits ne sont plus disponibles et n''ont pas été ajoutés au panier : %products%'

@@ -4,30 +4,48 @@ declare(strict_types=1);
 
 namespace Evolutive\SyliusWishlistPlugin\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Evolutive\SyliusWishlistPlugin\Entity\Wishlist;
+use Doctrine\ORM\QueryBuilder;
+use Evolutive\SyliusWishlistPlugin\Entity\WishlistInterface;
+use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
 
-/** @extends ServiceEntityRepository<Wishlist> */
-class WishlistRepository extends ServiceEntityRepository
+/**
+ * @template T of WishlistInterface
+ * @implements WishlistRepositoryInterface<T>
+ */
+class WishlistRepository extends EntityRepository implements WishlistRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    public function findByOwner(ChannelInterface $channel, ?CustomerInterface $customer, ?string $token): array
     {
-        parent::__construct($registry, Wishlist::class);
+        $queryBuilder = $this->createOwnerQueryBuilder($channel, $customer, $token);
+        if (null === $queryBuilder) {
+            return [];
+        }
+
+        /** @var list<WishlistInterface> $result */
+        $result = $queryBuilder
+            ->addSelect('i')
+            ->leftJoin('w.items', 'i')
+            ->addOrderBy('w.createdAt', 'ASC')
+            ->addOrderBy('w.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $result;
     }
 
-    public function findOneByCustomerAndChannel(CustomerInterface $customer, ChannelInterface $channel): ?Wishlist
+    public function findOneByIdAndOwner(mixed $id, ChannelInterface $channel, ?CustomerInterface $customer, ?string $token): ?WishlistInterface
     {
-        /** @var Wishlist|null $result */
-        $result = $this->createQueryBuilder('w')
-            ->andWhere('w.customer = :customer')
-            ->andWhere('w.channel = :channel')
-            ->setParameter('customer', $customer)
-            ->setParameter('channel', $channel)
-            ->orderBy('w.id', 'ASC')
-            ->setMaxResults(1)
+        if (!is_numeric($id)) {
+            return null;
+        }
+
+        /** @var WishlistInterface|null $result */
+        $result = $this->createOwnerQueryBuilder($channel, $customer, $token)
+            ?->andWhere('w.id = :id')
+            ->setParameter('id', (int) $id)
             ->getQuery()
             ->getOneOrNullResult()
         ;
@@ -35,32 +53,14 @@ class WishlistRepository extends ServiceEntityRepository
         return $result;
     }
 
-    public function findOneByTokenAndChannel(string $token, ChannelInterface $channel): ?Wishlist
-    {
-        /** @var Wishlist|null $result */
-        $result = $this->createQueryBuilder('w')
-            ->andWhere('w.token = :token')
-            ->andWhere('w.customer IS NULL')
-            ->andWhere('w.channel = :channel')
-            ->setParameter('token', $token)
-            ->setParameter('channel', $channel)
-            ->orderBy('w.id', 'ASC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-
-        return $result;
-    }
-
-    /** @return list<Wishlist> */
     public function findGuestWishlistsByToken(string $token): array
     {
-        /** @var list<Wishlist> $result */
+        /** @var list<WishlistInterface> $result */
         $result = $this->createQueryBuilder('w')
             ->andWhere('w.token = :token')
             ->andWhere('w.customer IS NULL')
             ->setParameter('token', $token)
+            ->addOrderBy('w.id', 'ASC')
             ->getQuery()
             ->getResult()
         ;
@@ -82,11 +82,7 @@ class WishlistRepository extends ServiceEntityRepository
         return is_numeric($count) ? (int) $count : 0;
     }
 
-    /**
-     * Deletes one batch; items go with their wishlist through the ON DELETE CASCADE foreign key.
-     *
-     * @return int number of deleted wishlists
-     */
+    /** Bulk DQL delete; items go with their wishlist through the ON DELETE CASCADE foreign key. */
     public function deleteGuestWishlistsNotUpdatedSince(\DateTimeImmutable $threshold, int $batchSize): int
     {
         /** @var list<int> $ids */
@@ -104,8 +100,8 @@ class WishlistRepository extends ServiceEntityRepository
             return 0;
         }
 
-        $deleted = $this->getEntityManager()->createQueryBuilder()
-            ->delete(Wishlist::class, 'w')
+        $deleted = $this->createQueryBuilder('w')
+            ->delete()
             ->andWhere('w.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
@@ -113,5 +109,30 @@ class WishlistRepository extends ServiceEntityRepository
         ;
 
         return is_numeric($deleted) ? (int) $deleted : 0;
+    }
+
+    private function createOwnerQueryBuilder(ChannelInterface $channel, ?CustomerInterface $customer, ?string $token): ?QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('w')
+            ->andWhere('w.channel = :channel')
+            ->setParameter('channel', $channel)
+        ;
+
+        if (null !== $customer) {
+            return $queryBuilder
+                ->andWhere('w.customer = :customer')
+                ->setParameter('customer', $customer)
+            ;
+        }
+
+        if (null === $token || '' === $token) {
+            return null;
+        }
+
+        return $queryBuilder
+            ->andWhere('w.token = :token')
+            ->andWhere('w.customer IS NULL')
+            ->setParameter('token', $token)
+        ;
     }
 }

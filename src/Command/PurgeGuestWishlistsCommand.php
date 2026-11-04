@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Evolutive\SyliusWishlistPlugin\Command;
 
-use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepository;
+use Evolutive\SyliusWishlistPlugin\Entity\WishlistInterface;
+use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepositoryInterface;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -21,8 +22,9 @@ final class PurgeGuestWishlistsCommand extends Command
 {
     private const BATCH_SIZE = 500;
 
+    /** @param WishlistRepositoryInterface<WishlistInterface> $wishlistRepository */
     public function __construct(
-        private readonly WishlistRepository $wishlistRepository,
+        private readonly WishlistRepositoryInterface $wishlistRepository,
         private readonly ClockInterface $clock,
         private readonly int $guestTtlDays,
     ) {

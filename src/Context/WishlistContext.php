@@ -4,87 +4,34 @@ declare(strict_types=1);
 
 namespace Evolutive\SyliusWishlistPlugin\Context;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Evolutive\SyliusWishlistPlugin\Entity\Wishlist;
-use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepository;
-use Psr\Clock\ClockInterface;
+use Evolutive\SyliusWishlistPlugin\Entity\WishlistInterface;
+use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepositoryInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Customer\Context\CustomerContextInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-/** Resolves the Current Wishlist of the visitor in the current channel. */
-class WishlistContext
+final class WishlistContext implements WishlistContextInterface, ResetInterface
 {
     public const SESSION_TOKEN_KEY = '_evolutive_wishlist.guest_token';
 
+    /** @var list<WishlistInterface>|null */
+    private ?array $wishlists = null;
+
+    /** @param WishlistRepositoryInterface<WishlistInterface> $wishlistRepository */
     public function __construct(
-        private readonly WishlistRepository $wishlistRepository,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly WishlistRepositoryInterface $wishlistRepository,
         private readonly ChannelContextInterface $channelContext,
         private readonly CustomerContextInterface $customerContext,
         private readonly RequestStack $requestStack,
-        private readonly ClockInterface $clock,
     ) {
     }
 
-    /** Never creates anything: viewing must not persist empty wishlists. */
-    public function getWishlist(): ?Wishlist
-    {
-        $channel = $this->getChannel();
-        $customer = $this->getCustomer();
-
-        if (null !== $customer) {
-            return $this->wishlistRepository->findOneByCustomerAndChannel($customer, $channel);
-        }
-
-        $token = $this->getSession()?->get(self::SESSION_TOKEN_KEY);
-        if (!is_string($token) || '' === $token) {
-            return null;
-        }
-
-        return $this->wishlistRepository->findOneByTokenAndChannel($token, $channel);
-    }
-
-    public function getOrCreateWishlist(): Wishlist
-    {
-        $wishlist = $this->getWishlist();
-        if (null !== $wishlist) {
-            return $wishlist;
-        }
-
-        $channel = $this->getChannel();
-        $now = $this->clock->now();
-        $customer = $this->getCustomer();
-
-        $wishlist = null !== $customer
-            ? Wishlist::forCustomer($customer, $channel, $now)
-            : Wishlist::forGuest($this->getOrCreateGuestToken(), $channel, $now);
-
-        $this->entityManager->persist($wishlist);
-
-        return $wishlist;
-    }
-
-    private function getOrCreateGuestToken(): string
-    {
-        $session = $this->getSession();
-        if (null === $session) {
-            throw new \LogicException('A session is required to create a guest wishlist.');
-        }
-
-        $token = $session->get(self::SESSION_TOKEN_KEY);
-        if (!is_string($token) || '' === $token) {
-            $token = bin2hex(random_bytes(32));
-            $session->set(self::SESSION_TOKEN_KEY, $token);
-        }
-
-        return $token;
-    }
-
-    private function getChannel(): ChannelInterface
+    public function getChannel(): ChannelInterface
     {
         /** @var ChannelInterface $channel */
         $channel = $this->channelContext->getChannel();
@@ -92,11 +39,86 @@ class WishlistContext
         return $channel;
     }
 
-    private function getCustomer(): ?CustomerInterface
+    public function getCustomer(): ?CustomerInterface
     {
         $customer = $this->customerContext->getCustomer();
 
         return $customer instanceof CustomerInterface ? $customer : null;
+    }
+
+    public function getGuestToken(): ?string
+    {
+        $token = $this->getSession()?->get(self::SESSION_TOKEN_KEY);
+
+        return is_string($token) && '' !== $token ? $token : null;
+    }
+
+    public function getOrCreateGuestToken(): string
+    {
+        $token = $this->getGuestToken();
+        if (null !== $token) {
+            return $token;
+        }
+
+        $session = $this->getSession();
+        if (null === $session) {
+            throw new \LogicException('A session is required to create a guest wishlist.');
+        }
+
+        $token = bin2hex(random_bytes(32));
+        $session->set(self::SESSION_TOKEN_KEY, $token);
+
+        return $token;
+    }
+
+    public function getWishlists(): array
+    {
+        return $this->wishlists ??= $this->wishlistRepository->findByOwner(
+            $this->getChannel(),
+            $this->getCustomer(),
+            $this->getGuestToken(),
+        );
+    }
+
+    public function getWishlist(mixed $id): ?WishlistInterface
+    {
+        if (!is_scalar($id)) {
+            return null;
+        }
+
+        foreach ($this->getWishlists() as $wishlist) {
+            $wishlistId = $wishlist->getId();
+            if (is_scalar($wishlistId) && (string) $wishlistId === (string) $id) {
+                return $wishlist;
+            }
+        }
+
+        return null;
+    }
+
+    public function getWishlistsContaining(ProductVariantInterface $variant): array
+    {
+        return array_values(array_filter(
+            $this->getWishlists(),
+            static fn (WishlistInterface $wishlist): bool => $wishlist->hasVariant($variant),
+        ));
+    }
+
+    public function countVariants(): int
+    {
+        $variantIds = [];
+        foreach ($this->getWishlists() as $wishlist) {
+            foreach ($wishlist->getItems() as $item) {
+                $variantIds[(string) $item->getVariant()?->getId()] = true;
+            }
+        }
+
+        return count($variantIds);
+    }
+
+    public function reset(): void
+    {
+        $this->wishlists = null;
     }
 
     private function getSession(): ?SessionInterface
