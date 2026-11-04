@@ -7,7 +7,7 @@ Lets shoppers, guests or logged-in customers, save products to come back to late
 - **Wishlist page** (`/{_locale}/wishlists/{id}`): select items to add them to the cart (they stay in the wishlist), remove them, or move them to other wishlists. The "Move to…" modal can create a wishlist on the spot; items already in a destination are skipped, so no duplicate is ever created. Items that are no longer available for purchase are flagged, and adding them to the cart is refused with an explanation.
 - **Guest wishlists.** They are tied to the session, like the guest cart. At login, each guest wishlist joins the customer's wishlists, merged into the one with the same name if it exists.
 - **Private.** Every lookup is scoped to the current owner and channel; another shopper's wishlist answers 404.
-- **Admin grid** under Customers › Wishlists, to browse and delete wishlists.
+- **Read-only admin** under Customers › Wishlists: a grid (name, owner or "Guest", product count, searchable by customer name or email) and a details page listing each product with its image, variant and channel price. Admins cannot create, edit or delete wishlists.
 - **Extensible through events**: wishlists and items are Sylius resources, and every change dispatches `evolutive_sylius_wishlist.wishlist[_item].pre_*|post_*` events (see [ADR 0003](docs/adr/0003-wishlist-as-sylius-resource-driven-by-events.md)).
 - **Purge command** deleting guest wishlists left orphaned once their session is gone.
 - English and French translations.
