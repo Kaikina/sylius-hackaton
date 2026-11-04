@@ -1,0 +1,56 @@
+sylius_grid:
+    grids:
+        evolutive_sylius_wishlist_admin_wishlist:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: "%evolutive_sylius_wishlist.model.wishlist.class%"
+            sorting:
+                updatedAt: desc
+            fields:
+                name:
+                    type: twig
+                    label: sylius.ui.name
+                    sortable: ~
+                    options:
+                        template: "@SyliusAdmin/shared/grid/field/name.html.twig"
+                owner:
+                    type: twig
+                    label: evolutive_sylius_wishlist.ui.owner
+                    path: .
+                    options:
+                        template: "@EvolutiveSyliusWishlistPlugin/admin/wishlist/grid/field/owner.html.twig"
+                channel:
+                    type: twig
+                    label: sylius.ui.channel
+                    options:
+                        template: "@SyliusAdmin/shared/grid/field/channel.html.twig"
+                items:
+                    type: twig
+                    label: evolutive_sylius_wishlist.ui.products
+                    options:
+                        template: "@EvolutiveSyliusWishlistPlugin/admin/wishlist/grid/field/items.html.twig"
+                updatedAt:
+                    type: twig
+                    label: sylius.ui.updated_at
+                    sortable: ~
+                    options:
+                        template: "@SyliusAdmin/shared/grid/field/date.html.twig"
+            filters:
+                search:
+                    type: string
+                    label: sylius.ui.search
+                    options:
+                        fields: [name, customer.email]
+                channel:
+                    type: entity
+                    label: sylius.ui.channel
+                    form_options:
+                        class: "%sylius.model.channel.class%"
+            actions:
+                item:
+                    delete:
+                        type: delete
+                bulk:
+                    delete:
+                        type: delete

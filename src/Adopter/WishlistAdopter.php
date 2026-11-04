@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace Evolutive\SyliusWishlistPlugin\Adopter;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Evolutive\SyliusWishlistPlugin\Context\WishlistContext;
-use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepository;
-use Psr\Clock\ClockInterface;
+use Evolutive\SyliusWishlistPlugin\Entity\WishlistInterface;
+use Evolutive\SyliusWishlistPlugin\Modifier\WishlistModifierInterface;
+use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepositoryInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * V1 rule: a guest wishlist becomes the customer's only if the customer has none in that channel,
- * otherwise it is discarded. The guest token is always forgotten afterwards.
+ * At login, each guest wishlist is merged into the customer's wishlist of the same name in that channel
+ * (variants already there are skipped), or becomes the customer's when there is none. The guest token is forgotten.
  */
 class WishlistAdopter
 {
+    /** @param WishlistRepositoryInterface<WishlistInterface> $wishlistRepository */
     public function __construct(
-        private readonly WishlistRepository $wishlistRepository,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly WishlistRepositoryInterface $wishlistRepository,
+        private readonly WishlistModifierInterface $wishlistModifier,
         private readonly RequestStack $requestStack,
-        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -40,19 +41,36 @@ class WishlistAdopter
             return;
         }
 
-        $now = $this->clock->now();
         foreach ($this->wishlistRepository->findGuestWishlistsByToken($token) as $guestWishlist) {
-            $existing = $this->wishlistRepository->findOneByCustomerAndChannel($customer, $guestWishlist->getChannel());
+            $channel = $guestWishlist->getChannel();
+            $namesake = null === $channel ? null : $this->findNamesake($customer, $channel, (string) $guestWishlist->getName());
 
-            if (null === $existing) {
-                $guestWishlist->assignToCustomer($customer, $now);
+            if (null === $namesake) {
+                $guestWishlist->assignToCustomer($customer);
+                $this->wishlistRepository->add($guestWishlist);
 
                 continue;
             }
 
-            $this->entityManager->remove($guestWishlist);
+            foreach ($guestWishlist->getItems() as $item) {
+                $variant = $item->getVariant();
+                if (null !== $variant) {
+                    $this->wishlistModifier->addVariant($namesake, $variant);
+                }
+            }
+
+            $this->wishlistRepository->remove($guestWishlist);
+        }
+    }
+
+    private function findNamesake(CustomerInterface $customer, ChannelInterface $channel, string $name): ?WishlistInterface
+    {
+        foreach ($this->wishlistRepository->findByOwner($channel, $customer, null) as $wishlist) {
+            if (0 === strcasecmp((string) $wishlist->getName(), $name)) {
+                return $wishlist;
+            }
         }
 
-        $this->entityManager->flush();
+        return null;
     }
 }

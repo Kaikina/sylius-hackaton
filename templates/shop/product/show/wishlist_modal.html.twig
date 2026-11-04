@@ -1,0 +1,19 @@
+{#
+    Rendered outside the summary column on purpose: that column is .sticky-top (its own stacking context
+    at z-index 1020), so a modal inside it would sit under Bootstrap's backdrop.
+#}
+{% set product = hookable_metadata.context.product %}
+{% set modal_id = 'evolutive-wishlist-product-modal' %}
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ modal_id }}-title">{{ 'evolutive_sylius_wishlist.ui.add_product_to_wishlist'|trans({'%product%': product.name}) }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'evolutive_sylius_wishlist.ui.close'|trans }}"></button>
+            </div>
+            <div class="modal-body">
+                {{ component('evolutive_wishlist:wishlist_picker', { product: product, followSelectedVariant: true }) }}
+            </div>
+        </div>
+    </div>
+</div>

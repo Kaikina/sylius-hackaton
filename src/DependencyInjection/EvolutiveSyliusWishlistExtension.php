@@ -20,6 +20,7 @@ final class EvolutiveSyliusWishlistExtension extends AbstractResourceExtension i
         /** @var array{guest_ttl: int} $config */
         $config = $this->processConfiguration(new Configuration(), $configs);
         $container->setParameter('evolutive_sylius_wishlist.guest_ttl', $config['guest_ttl']);
+        $container->setParameter('evolutive_sylius_wishlist.form.type.wishlist.validation_groups', ['evolutive_sylius_wishlist']);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('services.xml');

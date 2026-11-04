@@ -2,12 +2,13 @@
 
 Lets shoppers, guests or logged-in customers, save products to come back to later, separately from the cart.
 
-- **Heart toggle on product cards.** A product with several variants opens a modal where each variant is toggled on its own.
-- **Heart toggle on the product page.** It follows the variant currently selected in the add-to-cart form.
-- **Header counter** linking to the wishlist page, refreshed live when the wishlist changes.
-- **Wishlist page** (`/{_locale}/wishlist`), also linked from the customer account menu. From there, shoppers can add selected items to the cart, remove them, or clear the list. Items that are no longer available for purchase are flagged, and adding them to the cart is refused with an explanation.
-- **Guest wishlists.** They are tied to the session, like the guest cart. At login, a guest's wishlist is adopted by the customer if they have none yet in that channel.
-- **One wishlist per owner and channel.**
+- **Several named wishlists per shopper** (e.g. "Birthday", "Christmas"), created, renamed and deleted from `/{_locale}/wishlists`, also linked from the customer account menu and the header.
+- **Heart on product cards and product pages** opens a picker listing the shopper's wishlists: ticking a wishlist adds the variant to it, unticking removes it, and a new wishlist can be created inline. A shopper's very first wishlist, created from there, receives the product straight away. Products with several variants first ask which variant. The heart is filled when the product is in any wishlist.
+- **Wishlist page** (`/{_locale}/wishlists/{id}`): select items to add them to the cart (they stay in the wishlist), remove them, or move them to other wishlists. The "Move to…" modal can create a wishlist on the spot; items already in a destination are skipped, so no duplicate is ever created. Items that are no longer available for purchase are flagged, and adding them to the cart is refused with an explanation.
+- **Guest wishlists.** They are tied to the session, like the guest cart. At login, each guest wishlist joins the customer's wishlists, merged into the one with the same name if it exists.
+- **Private.** Every lookup is scoped to the current owner and channel; another shopper's wishlist answers 404.
+- **Admin grid** under Customers › Wishlists, to browse and delete wishlists.
+- **Extensible through events**: wishlists and items are Sylius resources, and every change dispatches `evolutive_sylius_wishlist.wishlist[_item].pre_*|post_*` events (see [ADR 0003](docs/adr/0003-wishlist-as-sylius-resource-driven-by-events.md)).
 - **Purge command** deleting guest wishlists left orphaned once their session is gone.
 - English and French translations.
 
@@ -45,9 +46,12 @@ The domain vocabulary is defined in [GLOSSARY.md](GLOSSARY.md), and design decis
     ```yaml
     evolutive_sylius_wishlist_shop:
         resource: "@EvolutiveSyliusWishlistPlugin/config/routes/shop.yaml"
+
+    evolutive_sylius_wishlist_admin:
+        resource: "@EvolutiveSyliusWishlistPlugin/config/routes/admin.yaml"
     ```
 
-5. Run the migrations. The plugin registers its own migrations, which create the `evolutive_wishlist` and `evolutive_wishlist_item` tables:
+5. Run the migrations. The plugin registers its own migrations, which create the `evolutive_wishlist` and `evolutive_wishlist_item` tables (Stage 1 wishlists without a name are renamed "My Favorites"):
 
     ```bash
     bin/console doctrine:migrations:migrate -n
@@ -105,6 +109,18 @@ vendor/bin/console sylius:fixtures:load -n   # optional
 
 symfony server:ca:install
 symfony server:start -d
+```
+
+Without the Symfony CLI, use PHP's built-in server with the bundled router, otherwise product thumbnails (`/media/cache/resolve/...`) answer 404:
+
+```bash
+php -S 127.0.0.1:8000 -t vendor/sylius/test-application/public tests/TestApplication/router.php
+```
+
+On MariaDB, set the real server version in `tests/TestApplication/.env.local`, otherwise Doctrine assumes MySQL 5.7 and migration commands fail:
+
+```dotenv
+DATABASE_URL="mysql://user:pass@127.0.0.1/db_%kernel.environment%?serverVersion=10.11.14-MariaDB&charset=utf8mb4"
 ```
 
 ### Quality checks

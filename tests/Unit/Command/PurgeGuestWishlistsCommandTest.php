@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Evolutive\SyliusWishlistPlugin\Unit\Command;
 
 use Evolutive\SyliusWishlistPlugin\Command\PurgeGuestWishlistsCommand;
-use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepository;
+use Evolutive\SyliusWishlistPlugin\Repository\WishlistRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -14,7 +14,7 @@ final class PurgeGuestWishlistsCommandTest extends TestCase
 {
     public function test_it_deletes_in_batches_wishlists_not_updated_within_the_ttl(): void
     {
-        $repository = $this->createMock(WishlistRepository::class);
+        $repository = $this->createMock(WishlistRepositoryInterface::class);
         $repository->expects(self::exactly(3))
             ->method('deleteGuestWishlistsNotUpdatedSince')
             ->with(new \DateTimeImmutable('2026-10-05 12:00:00'), self::anything())
@@ -29,7 +29,7 @@ final class PurgeGuestWishlistsCommandTest extends TestCase
 
     public function test_dry_run_only_counts_and_ttl_can_be_overridden(): void
     {
-        $repository = $this->createMock(WishlistRepository::class);
+        $repository = $this->createMock(WishlistRepositoryInterface::class);
         $repository->expects(self::never())->method('deleteGuestWishlistsNotUpdatedSince');
         $repository->method('countGuestWishlistsNotUpdatedSince')
             ->with(new \DateTimeImmutable('2026-11-03 12:00:00'))

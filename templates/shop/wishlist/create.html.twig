@@ -1,0 +1,15 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+
+{% block title %}{{ 'evolutive_sylius_wishlist.ui.new_wishlist'|trans }} | {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 36rem;" {{ sylius_test_html_attribute('wishlist-create') }}>
+    <h1 class="h2 mb-4">{{ 'evolutive_sylius_wishlist.ui.new_wishlist'|trans }}</h1>
+    {{ include('@EvolutiveSyliusWishlistPlugin/shop/wishlist/_form.html.twig', {
+        action: path('evolutive_sylius_wishlist_shop_wishlist_create'),
+        method: 'POST',
+        submit_label: 'evolutive_sylius_wishlist.ui.create',
+        cancel_path: path('evolutive_sylius_wishlist_shop_wishlist_index'),
+    }) }}
+</div>
+{% endblock %}

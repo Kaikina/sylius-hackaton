@@ -1,0 +1,12 @@
+<div {{ attributes }}>
+    {% set field = this.targetsField %}
+    {% if field is not null %}{% form_theme field 'bootstrap_5_layout.html.twig' %}{% endif %}
+    {% if field is null or field.children is empty %}
+        <p class="text-body-secondary">{{ 'evolutive_sylius_wishlist.ui.no_other_wishlist'|trans }}</p>
+    {% else %}
+        <div class="mb-2" {{ sylius_test_html_attribute('wishlist-move-targets') }}>
+            {{ form_widget(field) }}
+        </div>
+    {% endif %}
+    {{ include('@EvolutiveSyliusWishlistPlugin/shop/components/_create_wishlist.html.twig') }}
+</div>

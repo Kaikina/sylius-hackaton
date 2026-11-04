@@ -1,0 +1,15 @@
+sylius_resource:
+    resources:
+        evolutive_sylius_wishlist.wishlist:
+            driver: doctrine/orm
+            classes:
+                model: Evolutive\SyliusWishlistPlugin\Entity\Wishlist
+                interface: Evolutive\SyliusWishlistPlugin\Entity\WishlistInterface
+                repository: Evolutive\SyliusWishlistPlugin\Repository\WishlistRepository
+                form: Evolutive\SyliusWishlistPlugin\Form\Type\WishlistType
+
+        evolutive_sylius_wishlist.wishlist_item:
+            driver: doctrine/orm
+            classes:
+                model: Evolutive\SyliusWishlistPlugin\Entity\WishlistItem
+                interface: Evolutive\SyliusWishlistPlugin\Entity\WishlistItemInterface

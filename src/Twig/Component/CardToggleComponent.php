@@ -5,31 +5,25 @@ declare(strict_types=1);
 namespace Evolutive\SyliusWishlistPlugin\Twig\Component;
 
 use Evolutive\SyliusWishlistPlugin\Checker\VariantAvailabilityChecker;
-use Evolutive\SyliusWishlistPlugin\Modifier\WishlistModifier;
-use Sylius\Component\Channel\Context\ChannelContextInterface;
-use Sylius\Component\Core\Model\ChannelInterface;
+use Evolutive\SyliusWishlistPlugin\Context\WishlistContextInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Core\Repository\ProductVariantRepositoryInterface;
 use Sylius\TwigHooks\LiveComponent\HookableLiveComponentTrait;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
-use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\TwigComponent\Attribute\PostMount;
 
 /**
- * Heart on a product tile. Single-variant products toggle directly;
- * multi-variant products open a modal holding a VariantPickerComponent.
+ * Heart on a product tile, filled when any variant is in any wishlist. It opens a modal holding
+ * the wishlist picker (single variant) or the variant picker (several variants).
  */
 #[AsLiveComponent(name: 'evolutive_wishlist:card_toggle', template: '@EvolutiveSyliusWishlistPlugin/shop/components/card_toggle.html.twig')]
 final class CardToggleComponent
 {
-    use ComponentToolsTrait;
     use DefaultActionTrait;
     use HookableLiveComponentTrait;
     use ProductVariantsHydrationTrait;
@@ -51,9 +45,8 @@ final class CardToggleComponent
      * @param ProductVariantRepositoryInterface<ProductVariantInterface> $productVariantRepository
      */
     public function __construct(
-        private readonly WishlistModifier $wishlistModifier,
+        private readonly WishlistContextInterface $wishlistContext,
         private readonly VariantAvailabilityChecker $availabilityChecker,
-        private readonly ChannelContextInterface $channelContext,
         private readonly ProductRepositoryInterface $productRepository,
         private readonly ProductVariantRepositoryInterface $productVariantRepository,
     ) {
@@ -70,13 +63,9 @@ final class CardToggleComponent
     /** @return list<ProductVariantInterface> */
     public function getVariants(): array
     {
-        if (null === $this->variants) {
-            /** @var ChannelInterface $channel */
-            $channel = $this->channelContext->getChannel();
-            $this->variants = null === $this->product ? [] : $this->availabilityChecker->getWishlistableVariants($this->product, $channel);
-        }
-
-        return $this->variants;
+        return $this->variants ??= null === $this->product
+            ? []
+            : $this->availabilityChecker->getWishlistableVariants($this->product, $this->wishlistContext->getChannel());
     }
 
     public function isSingleVariant(): bool
@@ -87,7 +76,7 @@ final class CardToggleComponent
     public function isInWishlist(): bool
     {
         foreach ($this->getVariants() as $variant) {
-            if ($this->wishlistModifier->isInWishlist($variant)) {
+            if ([] !== $this->wishlistContext->getWishlistsContaining($variant)) {
                 return true;
             }
         }
@@ -95,20 +84,9 @@ final class CardToggleComponent
         return false;
     }
 
-    #[LiveAction]
-    public function toggle(): void
-    {
-        if (!$this->isSingleVariant()) {
-            return;
-        }
-
-        $this->wishlistModifier->toggle($this->getVariants()[0]);
-        $this->emit('evolutive_wishlist:changed');
-    }
-
-    /** Emitted up by the variant picker of this tile. */
+    /** Emitted up by the pickers inside this tile's modal. */
     #[LiveListener(self::PRODUCT_CHANGED_EVENT)]
-    public function refresh(#[LiveArg] mixed $productId = null): void
+    public function refresh(): void
     {
     }
 }

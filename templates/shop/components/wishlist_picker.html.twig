@@ -1,0 +1,35 @@
+<div {{ attributes }}>
+    {% if not this.wishlistable %}
+        <p class="text-body-secondary mb-0">{{ 'evolutive_sylius_wishlist.ui.not_wishlistable'|trans }}</p>
+    {% else %}
+        {% set rows = this.rows %}
+        {% if rows is empty %}
+            <p class="text-body-secondary">{{ 'evolutive_sylius_wishlist.ui.no_wishlist_yet'|trans }}</p>
+        {% else %}
+            <p class="small text-body-secondary mb-2">{{ 'evolutive_sylius_wishlist.ui.choose_destination'|trans }}</p>
+            {# A per-variant id makes Live Components rebuild the checkboxes when the variant changes: a morph only
+               syncs the "checked" attribute, so a box the shopper clicked earlier would stay ticked for the new variant. #}
+            <ul class="list-group list-group-flush mb-2" id="evolutive-wishlist-picker-list-{{ this.variant.id }}">
+                {% for row in rows %}
+                    {% set wishlist = row.wishlist %}
+                    {% set input_id = 'evolutive-wishlist-picker-' ~ this.variant.id ~ '-' ~ wishlist.id %}
+                    <li class="list-group-item px-0" {{ sylius_test_html_attribute('wishlist-destination', wishlist.name) }}>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="checkbox" id="{{ input_id }}"
+                                   {{ row.contains ? 'checked' }}
+                                   data-action="change->live#action"
+                                   data-live-action-param="toggle"
+                                   data-live-wishlist-id-param="{{ wishlist.id }}"
+                                   data-loading="addAttribute(disabled)">
+                            <label class="form-check-label d-flex justify-content-between" for="{{ input_id }}">
+                                <span>{{ wishlist.name }}</span>
+                                <span class="badge text-bg-light">{{ wishlist.countItems }}</span>
+                            </label>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {{ include('@EvolutiveSyliusWishlistPlugin/shop/components/_create_wishlist.html.twig') }}
+    {% endif %}
+</div>

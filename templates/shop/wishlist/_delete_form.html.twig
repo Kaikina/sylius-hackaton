@@ -1,0 +1,9 @@
+{# Expects: wishlist, button_class #}
+<form action="{{ path('evolutive_sylius_wishlist_shop_wishlist_delete', {id: wishlist.id}) }}" method="post" class="d-inline"
+      onsubmit="return confirm('{{ 'evolutive_sylius_wishlist.ui.delete_confirmation'|trans({'%wishlist%': wishlist.name})|e('js') }}')">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token(wishlist.id) }}">
+    <button type="submit" class="{{ button_class|default('btn btn-outline-danger') }}" {{ sylius_test_html_attribute('wishlist-delete', wishlist.name) }}>
+        {{ 'evolutive_sylius_wishlist.ui.delete'|trans }}
+    </button>
+</form>

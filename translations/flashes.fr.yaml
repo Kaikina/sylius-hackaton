@@ -1,0 +1,6 @@
+evolutive_sylius_wishlist:
+    wishlist:
+        create: La liste d'envies a été créée.
+        update: La liste d'envies a été renommée.
+        delete: La liste d'envies a été supprimée.
+        bulk_delete: Les listes d'envies ont été supprimées.

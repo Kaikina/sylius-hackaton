@@ -30,16 +30,28 @@
         <prototype
             namespace="Evolutive\SyliusWishlistPlugin\"
             resource="../src/*"
-            exclude="../src/{DependencyInjection,Entity,Migrations,Cart/CartAdditionResult.php,EvolutiveSyliusWishlistPlugin.php}"
+            exclude="../src/{DependencyInjection,Entity,Event,Form,Migrations,Cart/CartAdditionResult.php,EvolutiveSyliusWishlistPlugin.php}"
         />
+
+        <!-- Route expressions (expr:service(...)) need a public id. -->
+        <service id="evolutive_sylius_wishlist.context.wishlist" alias="Evolutive\SyliusWishlistPlugin\Context\WishlistContextInterface" public="true" />
+        <service id="Evolutive\SyliusWishlistPlugin\Context\WishlistContextInterface" alias="Evolutive\SyliusWishlistPlugin\Context\WishlistContext" />
+        <service id="Evolutive\SyliusWishlistPlugin\Modifier\WishlistModifierInterface" alias="Evolutive\SyliusWishlistPlugin\Modifier\WishlistModifier" />
+
+        <!-- AbstractResourceType is not autowirable: data class and validation groups are explicit. -->
+        <service id="Evolutive\SyliusWishlistPlugin\Form\Type\WishlistType">
+            <argument>%evolutive_sylius_wishlist.model.wishlist.class%</argument>
+            <argument>%evolutive_sylius_wishlist.form.type.wishlist.validation_groups%</argument>
+            <tag name="form.type" />
+        </service>
+
+        <service id="Evolutive\SyliusWishlistPlugin\Form\Type\WishlistItemsType">
+            <tag name="form.type" />
+        </service>
 
         <service id="Evolutive\SyliusWishlistPlugin\EventListener\WishlistAdoptionListener">
             <tag name="kernel.event_listener" event="security.interactive_login" method="onInteractiveLogin" />
             <tag name="kernel.event_listener" event="sylius.user.security.implicit_login" method="onImplicitLogin" />
-        </service>
-
-        <service id="Evolutive\SyliusWishlistPlugin\EventListener\AccountMenuListener">
-            <tag name="kernel.event_listener" event="sylius.menu.shop.account" method="addWishlistItem" />
         </service>
     </services>
 </container>

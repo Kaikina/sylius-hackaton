@@ -1,0 +1,15 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+
+{% block title %}{{ 'evolutive_sylius_wishlist.ui.rename_wishlist'|trans }} | {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 36rem;" {{ sylius_test_html_attribute('wishlist-update') }}>
+    <h1 class="h2 mb-4">{{ 'evolutive_sylius_wishlist.ui.rename_wishlist'|trans }}</h1>
+    {{ include('@EvolutiveSyliusWishlistPlugin/shop/wishlist/_form.html.twig', {
+        action: path('evolutive_sylius_wishlist_shop_wishlist_update', {id: wishlist.id}),
+        method: 'PUT',
+        submit_label: 'sylius.ui.save_changes',
+        cancel_path: path('evolutive_sylius_wishlist_shop_wishlist_show', {id: wishlist.id}),
+    }) }}
+</div>
+{% endblock %}

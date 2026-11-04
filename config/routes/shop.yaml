@@ -1,6 +1,5 @@
-evolutive_sylius_wishlist_shop_controllers:
-    resource: '../../src/Controller/Shop/'
-    type: attribute
+evolutive_sylius_wishlist_shop_wishlist:
+    resource: 'shop/wishlist.yaml'
     prefix: /{_locale}
     requirements:
         _locale: ^[A-Za-z]{2,4}(_([A-Za-z]{4}|[0-9]{3}))?(_([A-Za-z]{2}|[0-9]{3}))?$

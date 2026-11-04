@@ -1,25 +1,52 @@
 evolutive_sylius_wishlist:
     ui:
-        my_wishlist: My wishlist
+        my_wishlists: My wishlists
+        wishlists: Wishlists
+        all_wishlists: All wishlists
+        new_wishlist: New wishlist
+        create: Create
+        create_new_wishlist: Create a new wishlist
+        rename: Rename
+        rename_wishlist: Rename wishlist
+        delete: Delete
+        delete_confirmation: 'Delete the wishlist "%wishlist%"? Its products stay in the store and in your other wishlists.'
+        no_wishlist_yet: You have no wishlist yet.
+        no_other_wishlist: You have no other wishlist yet.
+        products_count: '{0}No product|{1}1 product|]1,Inf[%count% products'
+        products: Products
+        owner: Owner
+        guest: Guest
         add_to_wishlist: Add to wishlist
-        remove_from_wishlist: Remove from wishlist
-        in_wishlist: In your wishlist
-        choose_variant: 'Add "%product%" to your wishlist'
+        in_wishlist: In your wishlists
+        add_product_to_wishlist: 'Add "%product%" to a wishlist'
+        choose_destination: Choose the wishlists for this product
+        choose_another_variant: Choose another variant
+        not_wishlistable: This product cannot be added to a wishlist.
         close: Close
-        empty: Your wishlist is empty.
+        empty: This wishlist is empty.
         continue_shopping: Continue shopping
         select: Select
         select_all: Select all
         add_selected_to_cart: Add selected to cart
+        move_to: Move to…
+        move_selected_to: Move the selected products to
+        move: Move
         remove_selected: Remove selected
         clear: Clear wishlist
-        clear_confirmation: Remove all products from your wishlist?
+        clear_confirmation: Remove all products from this wishlist?
         unavailable: Unavailable
         remove: Remove
+    form:
+        wishlist:
+            name: Name
     flash:
-        invalid_csrf: Your session has expired, please try again.
+        invalid_form: Your session has expired, please try again.
         nothing_selected: Please select at least one product.
-        cleared: Your wishlist has been cleared.
-        removed: '{0}No product was removed.|{1}1 product removed from your wishlist.|]1,Inf[%count% products removed from your wishlist.'
+        no_destination_selected: Please choose at least one wishlist to move the products to.
+        not_wishlistable: This product cannot be added to a wishlist.
+        not_created: The wishlist could not be created.
+        cleared: 'The wishlist "%wishlist%" has been cleared.'
+        removed: '{0}No product was removed.|{1}1 product removed from the wishlist.|]1,Inf[%count% products removed from the wishlist.'
+        moved: '{1}1 product moved to %wishlists%.|]1,Inf[%count% products moved to %wishlists%.'
         added_to_cart: '{1}1 product added to your cart.|]1,Inf[%count% products added to your cart.'
         not_added_to_cart: '{1}This product is no longer available and was not added to your cart: %products%|]1,Inf[These products are no longer available and were not added to your cart: %products%'

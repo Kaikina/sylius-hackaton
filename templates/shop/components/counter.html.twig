@@ -1,9 +1,9 @@
 {% set count = this.count %}
 <div class="col-auto" {{ attributes }}>
-    <a href="{{ path('evolutive_sylius_wishlist_shop_wishlist_show') }}"
+    <a href="{{ path('evolutive_sylius_wishlist_shop_wishlist_index') }}"
        class="btn btn-icon btn-transparent px-0 position-relative"
-       aria-label="{{ 'evolutive_sylius_wishlist.ui.my_wishlist'|trans }}"
-       title="{{ 'evolutive_sylius_wishlist.ui.my_wishlist'|trans }}"
+       aria-label="{{ 'evolutive_sylius_wishlist.ui.my_wishlists'|trans }}"
+       title="{{ 'evolutive_sylius_wishlist.ui.my_wishlists'|trans }}"
        {{ sylius_test_html_attribute('wishlist-button') }}>
         {{ ux_icon('evolutive-wishlist:heart') }}
         {% if count > 0 %}

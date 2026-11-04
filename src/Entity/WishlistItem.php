@@ -11,29 +11,27 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 #[ORM\Entity]
 #[ORM\Table(name: 'evolutive_wishlist_item')]
 #[ORM\UniqueConstraint(name: 'evolutive_wishlist_item_variant_unique', columns: ['wishlist_id', 'variant_id'])]
-class WishlistItem
+class WishlistItem implements WishlistItemInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Wishlist::class, inversedBy: 'items')]
+    #[ORM\ManyToOne(targetEntity: WishlistInterface::class, inversedBy: 'items')]
     #[ORM\JoinColumn(name: 'wishlist_id', nullable: false, onDelete: 'CASCADE')]
-    private Wishlist $wishlist;
+    private ?WishlistInterface $wishlist = null;
 
     #[ORM\ManyToOne(targetEntity: ProductVariantInterface::class)]
     #[ORM\JoinColumn(name: 'variant_id', nullable: false, onDelete: 'CASCADE')]
-    private ProductVariantInterface $variant;
+    private ?ProductVariantInterface $variant = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
-    public function __construct(Wishlist $wishlist, ProductVariantInterface $variant, \DateTimeImmutable $createdAt)
+    public function __construct()
     {
-        $this->wishlist = $wishlist;
-        $this->variant = $variant;
-        $this->createdAt = $createdAt;
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -41,22 +39,31 @@ class WishlistItem
         return $this->id;
     }
 
-    public function getWishlist(): Wishlist
+    public function getWishlist(): ?WishlistInterface
     {
         return $this->wishlist;
     }
 
-    public function getVariant(): ProductVariantInterface
+    public function setWishlist(?WishlistInterface $wishlist): void
+    {
+        $this->wishlist = $wishlist;
+    }
+
+    public function getVariant(): ?ProductVariantInterface
     {
         return $this->variant;
     }
 
-    public function getProduct(): ProductInterface
+    public function setVariant(ProductVariantInterface $variant): void
     {
-        /** @var ProductInterface $product */
-        $product = $this->variant->getProduct();
+        $this->variant = $variant;
+    }
 
-        return $product;
+    public function getProduct(): ?ProductInterface
+    {
+        $product = $this->variant?->getProduct();
+
+        return $product instanceof ProductInterface ? $product : null;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
