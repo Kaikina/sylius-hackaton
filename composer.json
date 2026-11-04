@@ -1,7 +1,7 @@
 {
-    "name": "sylius/plugin-skeleton",
+    "name": "evolutive/sylius-wishlist-plugin",
     "type": "sylius-plugin",
-    "description": "Acme example plugin for Sylius.",
+    "description": "Wishlist plugin for Sylius",
     "keywords": [
         "sylius",
         "sylius-plugin",
@@ -32,6 +32,7 @@
         "phpunit/phpunit": "^10.5",
         "sylius-labs/coding-standard": "^4.4",
         "sylius-labs/suite-tags-extension": "~0.2",
+        "sylius/sylius-ai-dev-tools": "^0.6.0",
         "sylius/sylius-rector": "^2.0",
         "sylius/test-application": "^2.0.0@alpha",
         "symfony/browser-kit": "^6.4 || ^7.4",
@@ -60,27 +61,32 @@
         "symfony": {
             "require": "^7.4"
         },
-        "public-dir": "vendor/sylius/test-application/public"
+        "public-dir": "vendor/sylius/test-application/public",
+        "ai-mate": {
+            "extension": false,
+            "scan-dirs": [
+                "mate/src"
+            ],
+            "includes": [
+                "mate/config.php"
+            ]
+        }
     },
     "autoload": {
         "psr-4": {
-            "Acme\\SyliusExamplePlugin\\": "src/"
+            "Evolutive\\SyliusWishlistPlugin\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Acme\\SyliusExamplePlugin\\": ["tests/", "tests/TestApplication/src/"]
+            "Mate\\": "mate/src/",
+            "Tests\\Evolutive\\SyliusWishlistPlugin\\": [
+                "tests/",
+                "tests/TestApplication/src/"
+            ]
         }
     },
     "scripts": {
-        "post-root-package-install": [
-            "@php bin/validate-directory.php"
-        ],
-        "post-create-project-cmd": [
-            "@php bin/rename-plugin.php",
-            "@test-app-init",
-            "@php bin/show-success.php"
-        ],
         "database-reset": [
             "vendor/bin/console doctrine:database:drop --force --if-exists",
             "vendor/bin/console doctrine:database:create",

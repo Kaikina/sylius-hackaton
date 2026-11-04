@@ -1,13 +1,6 @@
-# Delete these routes and define your own shop routes here
-
-acme_sylius_example_static_welcome:
-    path: /static-welcome/{name}
-    defaults:
-        _controller: Acme\SyliusExamplePlugin\Controller\GreetingController::staticallyGreetAction
-        name: ~
-
-acme_sylius_example_dynamic_welcome:
-    path: /dynamic-welcome/{name}
-    defaults:
-        _controller: Acme\SyliusExamplePlugin\Controller\GreetingController::dynamicallyGreetAction
-        name: ~
+evolutive_sylius_wishlist_shop_controllers:
+    resource: '../../src/Controller/Shop/'
+    type: attribute
+    prefix: /{_locale}
+    requirements:
+        _locale: ^[A-Za-z]{2,4}(_([A-Za-z]{4}|[0-9]{3}))?(_([A-Za-z]{2}|[0-9]{3}))?$

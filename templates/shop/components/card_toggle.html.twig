@@ -1,0 +1,48 @@
+{# Zero-height wrapper so the heart overlays the top-right corner of the tile image. #}
+{% set variants = this.variants %}
+<div class="position-relative" {{ attributes }}>
+    {% if variants is not empty %}
+        {% set active = this.inWishlist %}
+        {% set label = (active ? 'evolutive_sylius_wishlist.ui.in_wishlist' : 'evolutive_sylius_wishlist.ui.add_to_wishlist')|trans %}
+        <div class="position-absolute top-0 end-0 m-2" style="z-index: 2;">
+            {% if this.singleVariant %}
+                <button type="button"
+                        class="btn btn-light rounded-circle p-2 lh-1 shadow-sm"
+                        aria-pressed="{{ active ? 'true' : 'false' }}"
+                        aria-label="{{ label }}" title="{{ label }}"
+                        data-action="live#action"
+                        data-live-action-param="toggle"
+                        data-loading="addAttribute(disabled)"
+                        {{ sylius_test_html_attribute('wishlist-toggle', product.code) }}>
+                    {{ include('@EvolutiveSyliusWishlistPlugin/shop/components/_heart.html.twig', {active}) }}
+                </button>
+            {% else %}
+                <button type="button"
+                        class="btn btn-light rounded-circle p-2 lh-1 shadow-sm"
+                        aria-label="{{ label }}" title="{{ label }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#{{ modalId }}"
+                        {{ sylius_test_html_attribute('wishlist-choose-variant', product.code) }}>
+                    {{ include('@EvolutiveSyliusWishlistPlugin/shop/components/_heart.html.twig', {active}) }}
+                </button>
+            {% endif %}
+        </div>
+
+        {% if not this.singleVariant %}
+            {# Ignored on re-render so Bootstrap's open state survives; the picker refreshes itself. #}
+            <div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-labelledby="{{ modalId }}-title" aria-hidden="true" data-live-ignore>
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="{{ modalId }}-title">{{ 'evolutive_sylius_wishlist.ui.choose_variant'|trans({'%product%': product.name}) }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'evolutive_sylius_wishlist.ui.close'|trans }}"></button>
+                        </div>
+                        <div class="modal-body">
+                            {{ component('evolutive_wishlist:variant_picker', { product: product }) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>

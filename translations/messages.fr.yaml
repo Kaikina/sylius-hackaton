@@ -1,0 +1,25 @@
+evolutive_sylius_wishlist:
+    ui:
+        my_wishlist: Ma liste d'envies
+        add_to_wishlist: Ajouter à ma liste d'envies
+        remove_from_wishlist: Retirer de ma liste d'envies
+        in_wishlist: Dans votre liste d'envies
+        choose_variant: 'Ajouter « %product% » à votre liste d''envies'
+        close: Fermer
+        empty: Votre liste d'envies est vide.
+        continue_shopping: Continuer mes achats
+        select: Sélectionner
+        select_all: Tout sélectionner
+        add_selected_to_cart: Ajouter la sélection au panier
+        remove_selected: Retirer la sélection
+        clear: Vider la liste
+        clear_confirmation: Retirer tous les produits de votre liste d'envies ?
+        unavailable: Indisponible
+        remove: Retirer
+    flash:
+        invalid_csrf: Votre session a expiré, veuillez réessayer.
+        nothing_selected: Veuillez sélectionner au moins un produit.
+        cleared: Votre liste d'envies a été vidée.
+        removed: '{0}Aucun produit retiré.|{1}1 produit retiré de votre liste d''envies.|]1,Inf[%count% produits retirés de votre liste d''envies.'
+        added_to_cart: '{1}1 produit ajouté au panier.|]1,Inf[%count% produits ajoutés au panier.'
+        not_added_to_cart: '{1}Ce produit n''est plus disponible et n''a pas été ajouté au panier : %products%|]1,Inf[Ces produits ne sont plus disponibles et n''ont pas été ajoutés au panier : %products%'

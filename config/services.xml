@@ -10,7 +10,36 @@
     </imports>
 
     <services>
-        <service id="Acme\SyliusExamplePlugin\Controller\GreetingController" autowire="true" autoconfigure="true" public="true" />
-        <!-- Put your services here -->
+        <defaults autowire="true" autoconfigure="true" public="false">
+            <bind key="Sylius\Component\Channel\Context\ChannelContextInterface" type="service" id="sylius.context.channel" />
+            <bind key="Sylius\Component\Customer\Context\CustomerContextInterface" type="service" id="sylius.context.customer" />
+            <bind key="Sylius\Component\Order\Context\CartContextInterface" type="service" id="sylius.context.cart" />
+            <bind key="Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface" type="service" id="sylius.checker.inventory.availability" />
+            <bind key="Sylius\Component\Core\Repository\ProductRepositoryInterface" type="service" id="sylius.repository.product" />
+            <bind key="Sylius\Component\Core\Repository\ProductVariantRepositoryInterface" type="service" id="sylius.repository.product_variant" />
+            <bind key="Sylius\Component\Product\Resolver\ProductVariantResolverInterface" type="service" id="sylius.resolver.product_variant" />
+            <bind key="Sylius\Component\Core\Factory\CartItemFactoryInterface" type="service" id="sylius.factory.cart_item" />
+            <bind key="Sylius\Component\Order\Modifier\OrderItemQuantityModifierInterface" type="service" id="sylius.modifier.order_item_quantity" />
+            <bind key="Sylius\Bundle\OrderBundle\Factory\AddToCartCommandFactoryInterface" type="service" id="sylius.factory.add_to_cart_command" />
+            <bind key="Sylius\Bundle\OrderBundle\Adder\CartItemAdderInterface" type="service" id="sylius.adder.cart_item" />
+            <bind key="Sylius\Bundle\CoreBundle\SectionResolver\SectionProviderInterface" type="service" id="sylius.section_resolver.uri_based" />
+            <bind key="$guestTtlDays">%evolutive_sylius_wishlist.guest_ttl%</bind>
+            <bind key="$validationGroups">%sylius.form.type.add_to_cart.validation_groups%</bind>
+        </defaults>
+
+        <prototype
+            namespace="Evolutive\SyliusWishlistPlugin\"
+            resource="../src/*"
+            exclude="../src/{DependencyInjection,Entity,Migrations,Cart/CartAdditionResult.php,EvolutiveSyliusWishlistPlugin.php}"
+        />
+
+        <service id="Evolutive\SyliusWishlistPlugin\EventListener\WishlistAdoptionListener">
+            <tag name="kernel.event_listener" event="security.interactive_login" method="onInteractiveLogin" />
+            <tag name="kernel.event_listener" event="sylius.user.security.implicit_login" method="onImplicitLogin" />
+        </service>
+
+        <service id="Evolutive\SyliusWishlistPlugin\EventListener\AccountMenuListener">
+            <tag name="kernel.event_listener" event="sylius.menu.shop.account" method="addWishlistItem" />
+        </service>
     </services>
 </container>

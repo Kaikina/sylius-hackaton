@@ -1,0 +1,2 @@
+{%- set options = variant.optionValues|map(v => v.value)|join(', ') -%}
+{{- variant.name ?: (options ?: variant.code) -}}

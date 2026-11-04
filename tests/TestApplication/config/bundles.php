@@ -1,5 +1,5 @@
 <?php
 
 return [
-    Acme\SyliusExamplePlugin\AcmeSyliusExamplePlugin::class => ['all' => true],
+    Evolutive\SyliusWishlistPlugin\EvolutiveSyliusWishlistPlugin::class => ['all' => true],
 ];

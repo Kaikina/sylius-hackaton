@@ -1,0 +1,30 @@
+<div {{ attributes }}>
+    <ul class="list-group list-group-flush">
+        {% for row in this.rows %}
+            {% set variant = row.variant %}
+            {% set label = (row.inWishlist ? 'evolutive_sylius_wishlist.ui.remove_from_wishlist' : 'evolutive_sylius_wishlist.ui.add_to_wishlist')|trans %}
+            <li class="list-group-item d-flex align-items-center gap-3 px-0" {{ sylius_test_html_attribute('wishlist-variant', variant.code) }}>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold">{{ include('@EvolutiveSyliusWishlistPlugin/shop/wishlist/_variant_label.html.twig', {variant}) }}</div>
+                    <div class="small">
+                        {{ component('sylius_shop:product:card:price', { variant: variant, template: '@SyliusShop/product/common/price.html.twig' }) }}
+                        {% if not row.inStock %}
+                            <span class="badge text-bg-secondary ms-2">{{ 'sylius.ui.out_of_stock'|trans }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <button type="button"
+                        class="btn btn-light rounded-circle p-2 lh-1"
+                        aria-pressed="{{ row.inWishlist ? 'true' : 'false' }}"
+                        aria-label="{{ label }}" title="{{ label }}"
+                        data-action="live#action"
+                        data-live-action-param="toggle"
+                        data-live-variant-id-param="{{ variant.id }}"
+                        data-loading="addAttribute(disabled)"
+                        {{ sylius_test_html_attribute('wishlist-variant-toggle', variant.code) }}>
+                    {{ include('@EvolutiveSyliusWishlistPlugin/shop/components/_heart.html.twig', {active: row.inWishlist}) }}
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

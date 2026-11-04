@@ -1,0 +1,25 @@
+evolutive_sylius_wishlist:
+    ui:
+        my_wishlist: My wishlist
+        add_to_wishlist: Add to wishlist
+        remove_from_wishlist: Remove from wishlist
+        in_wishlist: In your wishlist
+        choose_variant: 'Add "%product%" to your wishlist'
+        close: Close
+        empty: Your wishlist is empty.
+        continue_shopping: Continue shopping
+        select: Select
+        select_all: Select all
+        add_selected_to_cart: Add selected to cart
+        remove_selected: Remove selected
+        clear: Clear wishlist
+        clear_confirmation: Remove all products from your wishlist?
+        unavailable: Unavailable
+        remove: Remove
+    flash:
+        invalid_csrf: Your session has expired, please try again.
+        nothing_selected: Please select at least one product.
+        cleared: Your wishlist has been cleared.
+        removed: '{0}No product was removed.|{1}1 product removed from your wishlist.|]1,Inf[%count% products removed from your wishlist.'
+        added_to_cart: '{1}1 product added to your cart.|]1,Inf[%count% products added to your cart.'
+        not_added_to_cart: '{1}This product is no longer available and was not added to your cart: %products%|]1,Inf[These products are no longer available and were not added to your cart: %products%'

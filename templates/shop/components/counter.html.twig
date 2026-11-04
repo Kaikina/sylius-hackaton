@@ -1,0 +1,13 @@
+{% set count = this.count %}
+<div class="col-auto" {{ attributes }}>
+    <a href="{{ path('evolutive_sylius_wishlist_shop_wishlist_show') }}"
+       class="btn btn-icon btn-transparent px-0 position-relative"
+       aria-label="{{ 'evolutive_sylius_wishlist.ui.my_wishlist'|trans }}"
+       title="{{ 'evolutive_sylius_wishlist.ui.my_wishlist'|trans }}"
+       {{ sylius_test_html_attribute('wishlist-button') }}>
+        {{ ux_icon('evolutive-wishlist:heart') }}
+        {% if count > 0 %}
+            <span class="position-absolute top-0 start-0 badge rounded-pill bg-primary" {{ sylius_test_html_attribute('wishlist-quantity', count) }}>{{ count }}</span>
+        {% endif %}
+    </a>
+</div>

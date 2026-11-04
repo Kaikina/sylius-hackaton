@@ -1,10 +1,20 @@
 sylius_twig_hooks:
     hooks:
-        'app_shop.greeting.dynamic':
-            content:
-                template: '@AcmeSyliusExamplePlugin/shop/greeting/dynamic/content.html.twig'
-                priority: 0
-        'app_shop.greeting.static':
-            content:
-                template: '@AcmeSyliusExamplePlugin/shop/greeting/static/content.html.twig'
-                priority: 0
+        'sylius_shop.base.header.content':
+            wishlist:
+                component: 'evolutive_wishlist:counter'
+                priority: 150
+
+        'sylius_shop.shared.product.card':
+            wishlist:
+                component: 'evolutive_wishlist:card_toggle'
+                props:
+                    product: '@=_context.product'
+                priority: 200
+
+        'sylius_shop.product.show.content.info.summary':
+            wishlist:
+                component: 'evolutive_wishlist:product_toggle'
+                props:
+                    product: '@=_context.product'
+                priority: 50

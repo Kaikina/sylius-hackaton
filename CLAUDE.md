@@ -122,3 +122,7 @@ This project includes specialized AI guides to assist with common plugin develop
 - **COMPATIBILITY_GUIDE.md** - Best practices for maintaining compatibility across different Sylius versions
 
 These guides provide detailed instructions and automated workflows to help maintain code quality and ensure proper plugin structure.
+
+<!-- BEGIN AI_MATE_AGENTS_IMPORT -->
+@AGENTS.md
+<!-- END AI_MATE_AGENTS_IMPORT -->

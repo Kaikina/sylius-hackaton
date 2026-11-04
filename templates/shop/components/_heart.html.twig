@@ -1,0 +1,6 @@
+{# Expects: active (bool) #}
+{% if active %}
+    <span class="text-danger">{{ ux_icon('evolutive-wishlist:heart-filled') }}</span>
+{% else %}
+    {{ ux_icon('evolutive-wishlist:heart') }}
+{% endif %}

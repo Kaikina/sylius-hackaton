@@ -1,0 +1,95 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+
+{% block title %}{{ 'evolutive_sylius_wishlist.ui.my_wishlist'|trans }} | {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="container my-5" {{ sylius_test_html_attribute('wishlist') }}>
+    <h1 class="h2 mb-4">{{ 'evolutive_sylius_wishlist.ui.my_wishlist'|trans }}</h1>
+
+    {% if rows is empty %}
+        <div class="text-center py-5" {{ sylius_test_html_attribute('wishlist-empty') }}>
+            <p class="lead mb-4">{{ 'evolutive_sylius_wishlist.ui.empty'|trans }}</p>
+            <a href="{{ path('sylius_shop_homepage') }}" class="btn btn-primary">{{ 'evolutive_sylius_wishlist.ui.continue_shopping'|trans }}</a>
+        </div>
+    {% else %}
+        <form method="post" action="{{ path('evolutive_sylius_wishlist_shop_wishlist_update') }}" id="evolutive-wishlist-form">
+            <input type="hidden" name="_token" value="{{ csrf_token(csrf_token_id) }}">
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <div class="form-check me-auto">
+                    <input class="form-check-input" type="checkbox" id="evolutive-wishlist-select-all"
+                           onchange="this.form.querySelectorAll('input[name=&quot;variants[]&quot;]:not(:disabled)').forEach(c => c.checked = this.checked)">
+                    <label class="form-check-label" for="evolutive-wishlist-select-all">{{ 'evolutive_sylius_wishlist.ui.select_all'|trans }}</label>
+                </div>
+                <button type="submit" name="action" value="add_selected" class="btn btn-primary" {{ sylius_test_html_attribute('wishlist-add-selected') }}>
+                    {{ 'evolutive_sylius_wishlist.ui.add_selected_to_cart'|trans }}
+                </button>
+                <button type="submit" name="action" value="remove_selected" class="btn btn-outline-secondary" {{ sylius_test_html_attribute('wishlist-remove-selected') }}>
+                    {{ 'evolutive_sylius_wishlist.ui.remove_selected'|trans }}
+                </button>
+                <button type="submit" name="action" value="clear" class="btn btn-outline-danger"
+                        onclick="return confirm('{{ 'evolutive_sylius_wishlist.ui.clear_confirmation'|trans|e('js') }}')"
+                        {{ sylius_test_html_attribute('wishlist-clear') }}>
+                    {{ 'evolutive_sylius_wishlist.ui.clear'|trans }}
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th class="w-auto"><span class="visually-hidden">{{ 'evolutive_sylius_wishlist.ui.select'|trans }}</span></th>
+                            <th colspan="2">{{ 'sylius.ui.product'|trans }}</th>
+                            <th>{{ 'sylius.ui.price'|trans }}</th>
+                            <th class="text-end"><span class="visually-hidden">{{ 'sylius.ui.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            {% set variant = row.variant %}
+                            {% set product = row.product %}
+                            <tr {{ sylius_test_html_attribute('wishlist-item', variant.code) }}>
+                                <td>
+                                    <input class="form-check-input" type="checkbox" name="variants[]" value="{{ variant.id }}"
+                                           aria-label="{{ 'evolutive_sylius_wishlist.ui.select'|trans }}"
+                                           {{ not row.available ? 'disabled' }}>
+                                </td>
+                                <td style="width: 90px;">
+                                    <a href="{{ path('sylius_shop_product_show', {slug: product.slug}) }}" class="d-block overflow-hidden bg-light rounded-3" style="aspect-ratio: 3/4;">
+                                        {{ component('sylius_shop:main_image', { product: product, class: 'w-100 h-100 object-fit-cover' }) }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ path('sylius_shop_product_show', {slug: product.slug}) }}" class="link-reset fw-semibold" {{ sylius_test_html_attribute('wishlist-item-name') }}>{{ product.name }}</a>
+                                    {% if not product.simple %}
+                                        <div class="small text-body-secondary">{{ include('@EvolutiveSyliusWishlistPlugin/shop/wishlist/_variant_label.html.twig', {variant}) }}</div>
+                                    {% endif %}
+                                    {% if not row.available %}
+                                        <span class="badge text-bg-secondary mt-1" {{ sylius_test_html_attribute('wishlist-item-unavailable') }}>{{ 'evolutive_sylius_wishlist.ui.unavailable'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if variant.channelPricingForChannel(sylius.channel) %}
+                                        {{ component('sylius_shop:product:card:price', { variant: variant, template: '@SyliusShop/product/common/price.html.twig' }) }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <button type="submit" name="action" value="add:{{ variant.id }}" class="btn btn-sm btn-primary"
+                                            {{ not row.available ? 'disabled' }}
+                                            {{ sylius_test_html_attribute('wishlist-item-add-to-cart') }}>
+                                        {{ 'sylius.ui.add_to_cart'|trans }}
+                                    </button>
+                                    <button type="submit" name="action" value="remove:{{ variant.id }}" class="btn btn-sm btn-outline-secondary"
+                                            {{ sylius_test_html_attribute('wishlist-item-remove') }}>
+                                        {{ 'evolutive_sylius_wishlist.ui.remove'|trans }}
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
