@@ -1,129 +1,121 @@
-<p align="center">
-    <a href="https://sylius.com" target="_blank">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="https://media.sylius.com/sylius-logo-800-dark.png">
-          <source media="(prefers-color-scheme: light)" srcset="https://media.sylius.com/sylius-logo-800.png">
-          <img alt="Sylius Logo." src="https://media.sylius.com/sylius-logo-800.png">
-        </picture>
-    </a>
-</p>
+# Sylius Wishlist Plugin
 
-<h1 align="center">Plugin Skeleton</h1>
+Lets shoppers, guests or logged-in customers, save products to come back to later, separately from the cart.
 
-<p align="center">Skeleton for starting Sylius plugins.</p>
+- **Heart toggle on product cards.** A product with several variants opens a modal where each variant is toggled on its own.
+- **Heart toggle on the product page.** It follows the variant currently selected in the add-to-cart form.
+- **Header counter** linking to the wishlist page, refreshed live when the wishlist changes.
+- **Wishlist page** (`/{_locale}/wishlist`), also linked from the customer account menu. From there, shoppers can add selected items to the cart, remove them, or clear the list. Items that are no longer available for purchase are flagged, and adding them to the cart is refused with an explanation.
+- **Guest wishlists.** They are tied to the session, like the guest cart. At login, a guest's wishlist is adopted by the customer if they have none yet in that channel.
+- **One wishlist per owner and channel.**
+- **Purge command** deleting guest wishlists left orphaned once their session is gone.
+- English and French translations.
 
-## Documentation
+The domain vocabulary is defined in [GLOSSARY.md](GLOSSARY.md), and design decisions are recorded in [docs/adr](docs/adr).
 
-For a comprehensive guide on Sylius Plugins development please go to Sylius documentation,
-there you will find the <a href="https://docs.sylius.com/plugins-development-guide/how-to-create-a-plugin-for-sylius">Plugin Development Guide</a> - it's a great place to start.
+## Requirements
 
-For more information about the **Test Application** included in the skeleton, please refer to the [Sylius documentation](https://docs.sylius.com/plugins-development-guide/test-application).
+- PHP 8.2+
+- Sylius 2.x (shop built on Twig Hooks and Symfony UX Live Components)
 
-## Quickstart Installation
+## Installation
 
-Run `composer create-project sylius/plugin-skeleton ProjectName`.
-
-### Traditional
-
-1. From the plugin skeleton root directory, run the following commands:
+1. Require the plugin. It is not published on Packagist, so declare the repository first:
 
     ```bash
-    (cd vendor/sylius/test-application && yarn install)
-    (cd vendor/sylius/test-application && yarn build)
-    vendor/bin/console assets:install
-   
-    vendor/bin/console doctrine:database:create
-    vendor/bin/console doctrine:migrations:migrate -n
-    # Optionally load data fixtures
-    vendor/bin/console sylius:fixtures:load -n
+    composer config repositories.evolutive-wishlist vcs https://github.com/Kaikina/sylius-hackaton.git
+    composer require evolutive/sylius-wishlist-plugin:dev-main
     ```
 
-To be able to set up a plugin's database, remember to configure your database credentials in `tests/TestApplication/.env` and `tests/TestApplication/.env.test`.
+2. Register the bundle in `config/bundles.php`:
 
-2. Run your local server:
+    ```php
+    Evolutive\SyliusWishlistPlugin\EvolutiveSyliusWishlistPlugin::class => ['all' => true],
+    ```
 
-      ```bash
-      symfony server:ca:install
-      symfony server:start -d
-      ```
+3. Import the configuration, for example in `config/packages/evolutive_sylius_wishlist.yaml`:
 
-3. Open your browser and navigate to `https://localhost:8000`.
+    ```yaml
+    imports:
+        - { resource: "@EvolutiveSyliusWishlistPlugin/config/config.yaml" }
+    ```
+
+4. Import the routes, for example in `config/routes/evolutive_sylius_wishlist.yaml`:
+
+    ```yaml
+    evolutive_sylius_wishlist_shop:
+        resource: "@EvolutiveSyliusWishlistPlugin/config/routes/shop.yaml"
+    ```
+
+5. Run the migrations. The plugin registers its own migrations, which create the `evolutive_wishlist` and `evolutive_wishlist_item` tables:
+
+    ```bash
+    bin/console doctrine:migrations:migrate -n
+    ```
+
+6. Clear the cache. The shop hooks (header counter, product card and product page toggles) are registered automatically.
+
+## Configuration
+
+```yaml
+evolutive_sylius_wishlist:
+    # Days a guest wishlist may go without changes before the purge command deletes it.
+    guest_ttl: 30 # default, minimum 1
+```
+
+## Purging guest wishlists
+
+A guest loses access to their wishlist when their session ends. The database row stays behind, so schedule the purge, e.g. daily:
+
+```bash
+bin/console sylius:wishlist:purge-guest
+```
+
+| Option      | Description                                              |
+|-------------|----------------------------------------------------------|
+| `--ttl=N`   | Overrides the configured `guest_ttl`, in days            |
+| `--dry-run` | Only counts the wishlists that would be deleted          |
+
+Customer wishlists are never purged.
+
+## Development
+
+The repository ships a Sylius test application (`sylius/test-application`).
 
 ### Docker
 
-1. Execute `make init` to initialize the container and install the dependencies.
+```bash
+make init            # install dependencies
+make database-init   # create the database and run migrations
+make load-fixtures   # optional
+```
 
-2. Execute `make database-init` to create the database and run migrations.
+The shop is then available at `http://localhost`.
 
-3. (Optional) Execute `make load-fixtures` to load the fixtures.
+### Local
 
-4. Your app is available at `http://localhost`.
+Configure the database credentials in `tests/TestApplication/.env` and `tests/TestApplication/.env.test`, then:
 
-## Usage
+```bash
+(cd vendor/sylius/test-application && yarn install && yarn build)
+vendor/bin/console assets:install
+vendor/bin/console doctrine:database:create
+vendor/bin/console doctrine:migrations:migrate -n
+vendor/bin/console sylius:fixtures:load -n   # optional
 
-### Running plugin tests
+symfony server:ca:install
+symfony server:start -d
+```
 
-  - PHPUnit
+### Quality checks
 
-    ```bash
-    vendor/bin/phpunit
-    ```
+```bash
+vendor/bin/phpunit
+vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"
+vendor/bin/phpstan analyse -c phpstan.neon -l max src/
+vendor/bin/ecs check
+```
 
-  - Behat (non-JS scenarios)
+## License
 
-    ```bash
-    vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"
-    ```
-
-  - Behat (JS scenarios)
- 
-    1. [Install Symfony CLI command](https://symfony.com/download).
- 
-    2. Start Headless Chrome:
-    
-      ```bash
-      google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1
-      ```
-    
-    3. Install SSL certificates (only once needed) and run test application's webserver on `127.0.0.1:8080`:
-    
-      ```bash
-      symfony server:ca:install
-      APP_ENV=test symfony server:start --port=8080 --daemon
-      ```
-    
-    4. Run Behat:
-    
-      ```bash
-      vendor/bin/behat --strict --tags="@javascript,@mink:chromedriver"
-      ```
-    
-  - Static Analysis
-      
-    - PHPStan
-    
-      ```bash
-      vendor/bin/phpstan analyse -c phpstan.neon -l max src/  
-      ```
-
-  - Coding Standard
-  
-    ```bash
-    vendor/bin/ecs check
-    ```
-
-### Opening Sylius with your plugin
-
-- Using `test` environment:
-
-    ```bash
-    APP_ENV=test vendor/bin/console sylius:fixtures:load -n
-    APP_ENV=test symfony server:start -d
-    ```
-    
-- Using `dev` environment:
-
-    ```bash
-    vendor/bin/console sylius:fixtures:load -n
-    symfony server:start -d
-    ```
+MIT, see [LICENSE](LICENSE).
