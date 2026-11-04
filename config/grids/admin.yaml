@@ -11,9 +11,10 @@ sylius_grid:
                 name:
                     type: twig
                     label: sylius.ui.name
-                    sortable: ~
+                    path: .
+                    sortable: name
                     options:
-                        template: "@SyliusAdmin/shared/grid/field/name.html.twig"
+                        template: "@EvolutiveSyliusWishlistPlugin/admin/wishlist/grid/field/name.html.twig"
                 owner:
                     type: twig
                     label: evolutive_sylius_wishlist.ui.owner
@@ -41,7 +42,12 @@ sylius_grid:
                     type: string
                     label: sylius.ui.search
                     options:
-                        fields: [name, customer.email]
+                        fields: [name]
+                customer:
+                    type: evolutive_wishlist_customer
+                    label: sylius.ui.customer
+                    form_options:
+                        type: contains
                 channel:
                     type: entity
                     label: sylius.ui.channel
@@ -49,8 +55,5 @@ sylius_grid:
                         class: "%sylius.model.channel.class%"
             actions:
                 item:
-                    delete:
-                        type: delete
-                bulk:
-                    delete:
-                        type: delete
+                    show:
+                        type: show

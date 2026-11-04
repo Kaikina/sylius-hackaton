@@ -1,5 +1,9 @@
 evolutive_sylius_wishlist:
     ui:
+        wishlist: "Liste d'envies"
+        admin_empty: "Cette liste d'envies ne contient aucun produit."
+        added_at: Ajouté le
+        no_price: Aucun prix sur ce canal
         my_wishlists: Mes listes d'envies
         wishlists: Listes d'envies
         all_wishlists: Toutes les listes

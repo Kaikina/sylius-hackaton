@@ -1,0 +1,45 @@
+{% set wishlist = hookable_metadata.context.wishlist %}
+{% set customer = wishlist.customer %}
+
+<div class="card mb-3" {{ sylius_test_html_attribute('wishlist-general') }}>
+    <div class="card-body">
+        <div class="divide-y">
+            <div class="row">
+                <div class="col-12 col-md-4 fw-bold">{{ 'sylius.ui.name'|trans }}</div>
+                <div class="col-12 col-md-8" {{ sylius_test_html_attribute('wishlist-name') }}>{{ wishlist.name }}</div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4 fw-bold">{{ 'evolutive_sylius_wishlist.ui.owner'|trans }}</div>
+                <div class="col-12 col-md-8" {{ sylius_test_html_attribute('wishlist-owner') }}>
+                    {% if customer is not null %}
+                        <a href="{{ path('sylius_admin_customer_show', {id: customer.id}) }}">{{ customer.fullName|default(customer.email) }}</a>
+                    {% else %}
+                        <span class="badge" {{ sylius_test_html_attribute('wishlist-guest') }}>{{ 'evolutive_sylius_wishlist.ui.guest'|trans }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if customer is not null %}
+                <div class="row">
+                    <div class="col-12 col-md-4 fw-bold">{{ 'sylius.ui.email'|trans }}</div>
+                    <div class="col-12 col-md-8" {{ sylius_test_html_attribute('wishlist-owner-email') }}>{{ customer.email }}</div>
+                </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-12 col-md-4 fw-bold">{{ 'sylius.ui.channel'|trans }}</div>
+                <div class="col-12 col-md-8">{{ wishlist.channel.name }}</div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4 fw-bold">{{ 'evolutive_sylius_wishlist.ui.products'|trans }}</div>
+                <div class="col-12 col-md-8" {{ sylius_test_html_attribute('wishlist-product-count') }}>{{ wishlist.countItems }}</div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4 fw-bold">{{ 'sylius.ui.created_at'|trans }}</div>
+                <div class="col-12 col-md-8">{{ wishlist.createdAt|date('d-m-Y H:i') }}</div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-4 fw-bold">{{ 'sylius.ui.updated_at'|trans }}</div>
+                <div class="col-12 col-md-8">{{ wishlist.updatedAt|date('d-m-Y H:i') }}</div>
+            </div>
+        </div>
+    </div>
+</div>

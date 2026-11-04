@@ -1,9 +1,10 @@
+# Read-only: customers own their wishlists, the back office only browses them.
 evolutive_sylius_wishlist_admin_wishlist:
     resource: |
         alias: evolutive_sylius_wishlist.wishlist
         section: admin
-        templates: "@SyliusAdmin\\shared\\crud"
-        only: ['index', 'delete', 'bulkDelete']
+        templates: "@SyliusAdmin/shared/crud"
+        only: ['index', 'show']
         grid: evolutive_sylius_wishlist_admin_wishlist
         permission: true
     type: sylius.resource

@@ -1,5 +1,9 @@
 evolutive_sylius_wishlist:
     ui:
+        wishlist: Wishlist
+        admin_empty: This wishlist contains no products.
+        added_at: Added at
+        no_price: No price in this channel
         my_wishlists: My wishlists
         wishlists: Wishlists
         all_wishlists: All wishlists

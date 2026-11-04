@@ -1,0 +1,7 @@
+{% import '@SyliusAdmin/shared/helper/header.html.twig' as header %}
+
+{% set wishlist = hookable_metadata.context.resource %}
+
+<div class="col-12 col-md-6" {{ sylius_test_html_attribute('wishlist-title') }}>
+    {{ header.h1(wishlist.name, null, 'evolutive_sylius_wishlist.ui.wishlist'|trans) }}
+</div>

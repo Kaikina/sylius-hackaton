@@ -1,0 +1,26 @@
+sylius_twig_hooks:
+    hooks:
+        'sylius_admin.wishlist.show.content':
+            sections:
+                template: '@EvolutiveSyliusWishlistPlugin/admin/wishlist/show/content/sections.html.twig'
+                priority: 0
+
+        'sylius_admin.wishlist.show.content.header':
+            breadcrumbs:
+                template: '@SyliusAdmin/shared/crud/show/content/header/breadcrumbs.html.twig'
+                configuration:
+                    rendered_field: name
+                priority: 100
+
+        'sylius_admin.wishlist.show.content.header.title_block':
+            title:
+                template: '@EvolutiveSyliusWishlistPlugin/admin/wishlist/show/content/header/title_block/title.html.twig'
+                priority: 0
+
+        'sylius_admin.wishlist.show.content.sections':
+            general:
+                template: '@EvolutiveSyliusWishlistPlugin/admin/wishlist/show/content/sections/general.html.twig'
+                priority: 100
+            products:
+                template: '@EvolutiveSyliusWishlistPlugin/admin/wishlist/show/content/sections/products.html.twig'
+                priority: 0
